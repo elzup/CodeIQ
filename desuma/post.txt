@@ -1,0 +1,14 @@
+言語:
+PHP
+
+Team:
+SDL
+
+解答コード:
+<?=implode('
+',str_split(implode(str_repeat(@A,25),range(@B,@Z)),25))?>
+
+補足:
+"B"〜"Z"の配列を"A"15文字で区切りのテキストをつくり
+それを25文字区切りにして改行でつなげる
+

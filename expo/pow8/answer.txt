@@ -1,0 +1,91 @@
+※これは解答用テキストファイルです。
+
+■解答を記入してください。未記入の場合は大幅な減点となります。
+testdata.in.txt
+を入力とした場合の、出力結果を記入してください（各ケースごとに改行してください）。
+254361
+81
+84765625
+79967232
+11298161
+1
+57768001
+3328
+32397824
+25452801
+
+
+■使用言語・動作環境について
+(1)言語の種類を記入してください。未記入の場合、減点となります。
+PHP
+
+(2)コンパイラ／インタプリタの名称・バージョン情報を記入してください。未記入の場合、減点となります。
+PHP 5.6.3 (cli) (built: Nov 13 2014 18:31:57) 
+Copyright (c) 1997-2014 The PHP Group
+Zend Engine v2.6.0, Copyright (c) 1998-2014 Zend Technologies
+
+
+■プログラムの特長・工夫した点等、アピールポイントについて。
+あなたが書いたコードの内容や工夫した点をわかりやすく説明してください。
+未記入の場合や「特になし」のような記述は、大幅な減点となります。
+定数を定めて別のケースにも対応しやすくした
+モジュール毎に関数を分けた
+    2のべき乗数の和のリストを返す関数,
+    今回の解答に当たる結果の値を返す関数
+
+
+■もし企業からのスカウトメールがきたらどのくらい積極的にアクションすると思いますか？任意でお答えください。
+「積極的に会ってみたいと思う」「社名や条件次第では会ってみたいと思う」「よほどのことがない限り返信しない」、他ありましたら記入してください。
+積極的に会ってみたいと思う
+よければ会社へ訪ねさせていただきたい
+
+
+■あなたが書いたコードを貼り付けてください。未記入の場合は評価できません。
+コードが完全な形（そのままコンパイル・実行）できるものでない場合は程度に応じて減点の対象となります。
+<?php
+
+define("LIMIT", 100000000);
+//$filename = "./sample.in.txt";
+$filename = "./testdata.in.txt";
+
+$lines = explode(PHP_EOL, file_get_contents($filename));
+foreach ($lines as $line) {
+    list($base, $exp) = explode(' ', $line);
+    if ($base == 0 && $line == 0) {
+        break;
+    }
+    echo pow8($base, $exp) . PHP_EOL;
+}
+
+function pow8($base, $exp) {
+    $ps = split_pow2($exp);
+    $base_k = $base % LIMIT;
+    $res = array_shift($ps) ? $base_k : 1;
+    foreach ($ps as $n) {
+        $base_k = ($base_k * $base_k) % LIMIT;
+        if (!$n) {
+            continue;
+        }
+        $res = ($base_k * $res) % LIMIT;
+    }
+    return $res;
+}
+
+/**
+ * 2のべき乗数の和に分解
+ */
+function split_pow2($n) {
+    $i = 1;
+    while ($i * 2 <= $n) {
+        $i *= 2;
+    }
+    $nums = array();
+    while ($i >= 1) {
+        if ($nums[] = $n >= $i) {
+            $n -= $i;
+        }
+        $i /= 2;
+    }
+    $nums = array_reverse($nums);
+    return $nums;
+}

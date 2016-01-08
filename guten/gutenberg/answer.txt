@@ -1,0 +1,194 @@
+※これは解答用テキストファイルです。
+
+■gutenberg.csvから"STAY HUNGRY, STAY FOOLISH"という活字を取り出してください。未記入の場合、減点となります。
+答えは活字のある場所番号を(縦番号,横番号)で書いてください。
+記入例)
+1,4
+2,1
+1,6
+5,2
+5,4
+2,2
+3,4
+4,5
+5,1
+4,3
+1,1
+2,5
+6,1
+2,4
+6,6
+
+あなたの答え)
+2,2
+0,1
+0,2
+0,14
+8,2
+1,14
+3,2
+1,3
+0,7
+1,7
+0,19
+12,1
+8,11
+3,17
+1,11
+0,11
+4,19
+10,18
+1,15
+0,4
+1,12
+0,9
+0,15
+6,16
+2,9
+
+■あなたが書いたPHPのバージョンを教えてください。未記入の場合、減点となります。
+PHP 5.6.3 (cli) (built: Nov 13 2014 18:31:57) 
+Copyright (c) 1997-2014 The PHP Group
+Zend Engine v2.6.0, Copyright (c) 1998-2014 Zend Technologies
+
+■あなたが書いたコードの内容や工夫した点をわかりやすく説明してください。未記入の場合、減点となります。
+・アルゴリズム部分解説
+文字をKeyとする配列に座標を記録したオブジェクトをキューとして一度保存し
+検索文字列を一文字ずつ取り出していく
+
+・その他
+GutenManager クラス を作りオブジェクト化し別のケースでもテスト出来るように汎用的にした
+それぞれモジュールごとに分けてメソッド化,関数化をした
+得た結果から検証テストを行うメソッドを作り確認した
+実行環境に依存しないような構文を意識した(配列初期化はarray(),省略タグ未使用)
+
+■もし企業からのスカウトメールがきたらどのくらい積極的にアクションすると思いますか？任意でお答えください。
+「積極的に会ってみたいと思う」「社名や条件次第では会ってみたいと思う」「よほどのことがない限り返信しない」、他ありましたら記入してください。
+積極的に会ってみたいと思う
+興味がれば会社に訪ねさせていただきたい
+
+■あなたが書いたコードを貼り付けてください。未記入の場合、減点となります。
+<?php
+
+define('FORMAT_PRINT', '%Y%,%X%');
+//define('FORMAT_PRINT', '%Y%,%X% = %C%');
+$filename_csv = "./gutenberg.csv";
+$search_text = "STAY HUNGRY, STAY FOOLISH";
+
+// コマンドライン引数から実行
+if (isset($argv[1])) {
+    $filename_csv = $argv[1];
+}
+if (isset($argv[2])) {
+    $search_text = $argv[2];
+}
+
+$gm = new GutenManager($filename_csv, $search_text);
+try {
+    $gm->run();
+    echo $gm;
+//    $gm->result_test();
+} catch (Exception $e) {
+    echo 'caught Exception: ' . $e->getMessage();
+}
+
+class GutenManager {
+    private $search_text;
+    private $filename_csv;
+    private $char_list;
+    private $queues;
+    private $result_data_list;
+
+    public function __construct($filename_csv, $search_text) {
+        $this->filename_csv = $filename_csv;
+        $this->search_text = $search_text;
+    }
+
+    public function run() {
+        $this->_initialize_queue();
+        $this->_searching();
+    }
+
+    private function _initialize_queue() {
+        $this->char_list = get_csv($this->filename_csv);
+        $this->queues = GutenManager::create_queues($this->char_list);
+    }
+
+    private function _searching() {
+        $search_chars = str_split($this->search_text);
+        $this->result_data_list = array();
+        foreach ($search_chars as $c) {
+            if (!$data = @array_shift($this->queues[$c])) {
+                throw new Exception('文字が足りません');
+            }
+            $this->result_data_list[] = $data;
+        }
+    }
+
+    /**
+     * 二次配列からをDataキュー作成
+     * @param $char_list string[][]
+     */
+    public static function create_queues($char_list) {
+        $queues = array();
+        foreach ($char_list as $y => $chars) {
+            foreach ($chars as $x => $c) {
+                if (!isset($queues[$c])) {
+                    $queues[$c] = array();
+                }
+                $queues[$c][] = new Data($x, $y, $c);
+            }
+        }
+        return $queues;
+    }
+
+    public function result_test() {
+        $strs = array();
+        foreach ($this->result_data_list as $data) {
+            if (!isset($this->char_list[$data->y][$data->y])) {
+                throw new Exception("テスト失敗 Index");
+            }
+            $strs[] = $this->char_list[$data->y][$data->x];
+        }
+        $res = implode('', $strs);
+        echo '検索テキスト: ' . $this->search_text . PHP_EOL;
+        echo 'テスト結果　: ' . $res . PHP_EOL;
+        echo '[' . ($res == $this->search_text ? "一致" : "不一致") . ']';
+    }
+
+    public function __tostring() {
+        return implode(PHP_EOL, $this->result_data_list);
+    }
+}
+
+class Data {
+    public $x;
+    public $y;
+    public $char;
+
+    public function __construct($x, $y, $char) {
+        $this->x = $x;
+        $this->y = $y;
+        $this->char = $char;
+    }
+
+    public function __tostring() {
+        return strtr(FORMAT_PRINT, array('%X%' => $this->x, '%Y%' => $this->y, '%C%' => $this->char));
+    }
+}
+
+/**
+* csvファイルを読み込み二次配列を返す
+* @param $filename string
+* @return string[][]
+*/
+function get_csv($filename) {
+    $h = fopen($filename, 'r');
+    $datas = array();
+    while ($data = fgetcsv($h)) {
+        $datas[] = $data;
+    }
+    fclose($h);
+    return $datas;
+}
+

@@ -1,0 +1,8 @@
+switch((typeof q)[0]){case "o":return q.concat(q).concat(q);case "b":return !q}return q+q+q;
+return (q instanceof Array)?q.concat(q).concat(q):({"b":!q,"s":q+q+q,"n":q*3})[((typeof q)[0])]
+return (q instanceof Array)?q.concat(q).concat(q):({b:!q,s:q+q+q,n:q*3})[((typeof q)[0])]
+return (q instanceof Array)?q.concat(q).concat(q):({b:!q,s:q+q+q,n:q*3})[(typeof q)[0]]
+try{return q.concat(q).concat(q)}catch(e){return ({b:!q,s:q+q+q,n:q*3})[(typeof q)[0]]}
+try{return q.concat(q).concat(q)}catch(e){return ({b:!q,n:q*3})[(typeof q)[0]]}
+return try{q.concat(q).concat(q)}catch(e){({b:!q,n:q*3})[(typeof q)[0]]}
+

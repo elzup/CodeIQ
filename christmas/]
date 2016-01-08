@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>音楽</title>
+    <style>
+        *{ margin : 0; padding : 0; }
+        .snowman {
+            width: 100px;
+            height: 100px;
+            border: solid 2px;
+            border-radius: 47%;
+            margin: 100px 10px 10px;
+            box-shadow: -3px -2px 3px inset, 46px 54px 2px -45px,45px 40px 2px -49px,56px 42px 2px -49px,59px 54px 2px -49px;
+        }
+        .snowman:before {
+            content: '\'ω\'';
+            padding: 18% 20%;
+            line-height: 0;
+            border: solid 2px;
+            border-radius: 50%;
+            background: white;
+            margin: 6px;
+            font-size: 30px;
+            box-shadow: -3px -2px 3px inset;
+        }
+    </style>
+    <script>
+audio = document.getElementById("audio");
+document.getElementById("btn").addEventListener('click', function () {
+  audio.play();
+});
+    </script>
+</head>
+<body>
+    <div class="snowman"></div>
+    <audio src="./snow_orc.mp3" preload="auto">
+    <input type="button" id="button" value="再生">
+</body>
+</html>

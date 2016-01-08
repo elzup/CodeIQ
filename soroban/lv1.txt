@@ -1,0 +1,1 @@
+r=(i+"").split("").map(function(v){return("0"+(+v).toString(5)).slice(-2)}).join("")

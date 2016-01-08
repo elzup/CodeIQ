@@ -1,0 +1,136 @@
+※これは解答用テキストファイルです。
+
+■4桁の整数で元の数の「各桁の和」が「素因数分解した『×』の数」と等しくなるもの答えてください。未記入の場合は大幅な減点となります。
+記入例）
+1000
+2000
+3000
+4000
+
+あなたの解答）
+1001
+1010
+1040
+1110
+1300
+1400
+1600
+2010
+2304
+3100
+3120
+4200
+8000
+
+■使用言語・動作環境について
+(1)言語の種類を記入してください。未記入の場合、減点となります。
+PHP
+
+(2)コンパイラ／インタプリタの名称・バージョン情報を記入してください。未記入の場合、減点となります。
+PHP 5.6.3 (cli) (built: Nov 13 2014 18:31:57) 
+Copyright (c) 1997-2014 The PHP Group
+Zend Engine v2.6.0, Copyright (c) 1998-2014 Zend Technologies
+
+
+■プログラムの特長・工夫した点等、アピールポイントについて。
+あなたが書いたコードの内容や工夫した点をわかりやすく説明してください。
+未記入の場合や「特になし」のような記述は、大幅な減点となります。
+
+モジュールごとに分割を行った
+    今回の場合, 各桁の和を返す関数, 素因数の数を返す関数, 素因数一覧を返す関数, 最初の素因数を返す関数の４つの関数を作成した
+素因数を発見するモジュールの高速化を意識している
+    2つインクリメントしてループ回数を減らすなど
+標準ライブラリにある関数はできるだけ使用して簡略化している
+    array_product, implode
+実行環境への依存を減らした
+    配列初期化構文など
+
+■もし企業からのスカウトメールがきたらどのくらい積極的にアクションすると思いますか？任意でお答えください。
+「積極的に会ってみたいと思う」「社名や条件次第では会ってみたいと思う」「よほどのことがない限り返信しない」、他ありましたら記入してください。
+積極的に会ってみたいと思う
+よければ会社に伺いたい
+
+
+■あなたが書いたコードを貼り付けてください。未記入の場合は評価できません。
+<?php
+
+$asn_list = array();
+for ($i = 1000; $i < 10000; $i++) {
+    if (sum_degits($i) == count_pfd($i) - 1) {
+        $asn_list[] = $i;
+    }
+}
+echo implode(PHP_EOL, $asn_list);
+
+/* get_pfds 関数のテスト
+for ($i = 2; $i < 100; $i++) {
+    $ps = get_pfds($i);
+    echo $i . ': ' . implode('x', $ps) . '=' . array_product($ps) . PHP_EOL;
+}
+ */
+
+/**
+ * count prime factor decomposition
+ * 素因数の数を返す
+ *
+ * @param $num int 対象の数値
+ * @return int 素因数の数
+ */
+function count_pfd($num) {
+    return count(get_pfds($num));
+}
+
+/**
+ * count prime factor decomposition
+ * 素因数の数を返す
+ *
+ * @param $num int 対象の数値
+ * @return int[] 素因数の配列
+ */
+function get_pfds($num) {
+    $num_tmp = $num;
+    $min_limit = 2;
+    $cs = array();
+    while ($p = first_prime($num, $min_limit)) {
+        while ($num_tmp % $p == 0) {
+            $cs[] = $p;
+            $num_tmp /= $p;
+        }
+        $min_limit = $p + 1;
+    }
+    if ($num_tmp != 1) {
+        $cs[] = $num_tmp;
+    }
+    return $cs;
+}
+
+/**
+ * 最初の素因数を返す
+ * ない場合はNULL
+ * @param $num int 対象の数値
+ * @param $min_limit int 下限値
+ * @return int|bool 素因数|NULL
+ */
+function first_prime($num, $min_limit) {
+    if ($min_limit == 2 && $num % 2 == 0) {
+        return 2;
+    }
+    $start = floor($min_limit / 2) * 2 + 1;
+    $end = sqrt($num);
+    for ($i = $start; $i <= $end; $i+= 2) {
+        if ($num % $i == 0) {
+            return $i;
+        }
+    }
+    return FALSE;
+}
+
+/**
+ * 各桁の和を返す
+ *
+ * @param $num int 対象の数値
+ * @return int 素因数の数
+ */
+function sum_degits($num) {
+    return array_sum(str_split($num));
+}
